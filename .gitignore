@@ -1,2 +1,4 @@
 01-gobject
-02-gobject
+02-refcount
+03-type-decl-verbose
+04-type-decl-macro
