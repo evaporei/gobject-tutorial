@@ -7,9 +7,9 @@ struct _TDouble {
 
 G_DEFINE_TYPE (TDouble, t_double, G_TYPE_OBJECT);
 
-void t_double_class_init (TDoubleClass *class) {}
+void t_double_class_init (TDoubleClass *class) { g_print ("t_double_class_init\n"); }
 
-void t_double_init (TDouble *d) {}
+void t_double_init (TDouble *d) { g_print ("t_double_init\n"); }
 
 gboolean t_double_get_value (TDouble *d, double *value) {
   g_return_val_if_fail (T_IS_DOUBLE (d), FALSE);

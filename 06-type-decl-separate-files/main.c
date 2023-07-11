@@ -63,6 +63,8 @@ void math() {
 }
 
 int main() {
+  g_print("main\n");
+
   TDouble *d;
   double value;
 
