@@ -33,44 +33,29 @@ TDouble *t_double_new (double value) {
   return d;
 }
 
+#define t_double_binary_op(op) \
+  g_return_val_if_fail (T_IS_DOUBLE (self), NULL); \
+  g_return_val_if_fail (T_IS_DOUBLE (other), NULL); \
+  \
+  double other_value; \
+  g_return_val_if_fail (t_double_get_value (other, &other_value), NULL); \
+  \
+  return t_double_new (self->value op other_value);
+
 TDouble *t_double_add (TDouble *self, TDouble *other) {
-  g_return_val_if_fail (T_IS_DOUBLE (self), NULL);
-  g_return_val_if_fail (T_IS_DOUBLE (other), NULL);
-
-  double other_value;
-  g_return_val_if_fail (t_double_get_value (other, &other_value), NULL);
-
-  return t_double_new (self->value + other_value);
+  t_double_binary_op(+)
 }
 
 TDouble *t_double_sub (TDouble *self, TDouble *other) {
-  g_return_val_if_fail (T_IS_DOUBLE (self), NULL);
-  g_return_val_if_fail (T_IS_DOUBLE (other), NULL);
-
-  double other_value;
-  g_return_val_if_fail (t_double_get_value (other, &other_value), NULL);
-
-  return t_double_new (self->value - other_value);
+  t_double_binary_op(-)
 }
 
 TDouble *t_double_mul (TDouble *self, TDouble *other) {
-  g_return_val_if_fail (T_IS_DOUBLE (self), NULL);
-  g_return_val_if_fail (T_IS_DOUBLE (other), NULL);
-
-  double other_value;
-  g_return_val_if_fail (t_double_get_value (other, &other_value), NULL);
-
-  return t_double_new (self->value * other_value);
+  t_double_binary_op(*)
 }
 
 TDouble *t_double_div (TDouble *self, TDouble *other) {
-  g_return_val_if_fail (T_IS_DOUBLE (self), NULL);
-  g_return_val_if_fail (T_IS_DOUBLE (other), NULL);
-
-  double other_value;
-  g_return_val_if_fail (t_double_get_value (other, &other_value), NULL);
-
-  return t_double_new (self->value / other_value);
+  t_double_binary_op(/)
 }
 
 TDouble *t_double_inv (TDouble *self) {
