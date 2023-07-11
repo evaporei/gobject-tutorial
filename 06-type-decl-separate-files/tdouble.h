@@ -13,5 +13,9 @@ void t_double_set_value (TDouble *d, double value);
 TDouble *t_double_new (double value);
 
 TDouble *t_double_add (TDouble *self, TDouble *other);
+TDouble *t_double_sub (TDouble *self, TDouble *other);
+TDouble *t_double_mul (TDouble *self, TDouble *other);
+TDouble *t_double_div (TDouble *self, TDouble *other);
+TDouble *t_double_inv (TDouble *self);
 
 #endif
