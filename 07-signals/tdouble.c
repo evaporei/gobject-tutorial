@@ -9,14 +9,18 @@ struct _TDouble {
 
 G_DEFINE_TYPE (TDouble, t_double, G_TYPE_OBJECT);
 
+void div_by_zero_default_cb (TDouble *d, gpointer user_data) {
+  g_printerr ("\nError: division by zero.\n\n");
+}
+
 void t_double_class_init (TDoubleClass *class) {
   g_print ("t_double_class_init\n");
 
-  t_double_signal = g_signal_new (
+  t_double_signal = g_signal_new_class_handler (
       "div-by-zero",
       G_TYPE_FROM_CLASS (class),
       G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
-      0,
+      G_CALLBACK (div_by_zero_default_cb),
       NULL,
       NULL,
       NULL,
