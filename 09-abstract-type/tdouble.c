@@ -1,0 +1,154 @@
+#include "tdouble.h"
+#include "tint.h"
+
+#define PROP_DOUBLE 1
+static GParamSpec *double_property = NULL;
+
+struct _TDouble {
+  TNumber parent;
+  double value;
+};
+
+G_DEFINE_TYPE (TDouble, t_double, T_TYPE_NUMBER);
+
+static void t_double_set_property (GObject *object, guint property_id, const GValue *value, GParamSpec *pspec) {
+  TDouble *self = T_DOUBLE (object);
+
+  if (property_id == PROP_DOUBLE) {
+    self->value = g_value_get_double (value);
+  } else {
+    G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+  }
+}
+
+static void t_double_get_property (GObject *object, guint property_id, GValue *value, GParamSpec *pspec) {
+  TDouble *self = T_DOUBLE (object);
+
+  if (property_id == PROP_DOUBLE) {
+    g_value_set_double (value, self->value);
+  } else {
+    G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+  }
+}
+
+static void t_double_init (TDouble *d) {}
+
+#define t_double_unary_type_check(name) \
+  g_return_val_if_fail (T_IS_DOUBLE (name), NULL)
+
+#define t_double_binary_type_check \
+  t_double_unary_type_check (self); \
+  t_double_unary_type_check (other)
+
+#define t_double_binary_op(op) \
+  int i; \
+  double d; \
+  if (T_IS_INT (other)) { \
+    g_object_get (T_INT (other), "value", &i, NULL); \
+    return T_NUMBER (t_double_new_with_value (T_DOUBLE (self)->value op (double) i)); \
+  } else { \
+    g_object_get (T_DOUBLE (other), "value", &d, NULL); \
+    return T_NUMBER (t_double_new_with_value (T_DOUBLE (self)->value op d)); \
+  }
+
+TNumber *t_double_add (TNumber *self, TNumber *other) {
+  t_double_unary_type_check (self);
+
+  t_double_binary_op (+)
+}
+
+TNumber *t_double_sub (TNumber *self, TNumber *other) {
+  t_double_unary_type_check (self);
+
+  t_double_binary_op (-)
+}
+
+TNumber *t_double_mul (TNumber *self, TNumber *other) {
+  t_double_unary_type_check (self);
+
+  t_double_binary_op (*)
+}
+
+TNumber *t_double_div (TNumber *self, TNumber *other) {
+  t_double_unary_type_check (self);
+
+  int i; \
+  double d; \
+  if (T_IS_INT (other)) { \
+    g_object_get (T_INT (other), "value", &i, NULL); \
+    if (i == 0) {
+      g_signal_emit_by_name (self, "div-by-zero");
+      return NULL;
+    }
+    return T_NUMBER (t_double_new_with_value (T_DOUBLE (self)->value / (double) i)); \
+  } else { \
+    g_object_get (T_DOUBLE (other), "value", &d, NULL); \
+    if (d == 0.0) {
+      g_signal_emit_by_name (self, "div-by-zero");
+      return NULL;
+    }
+    return T_NUMBER (t_double_new_with_value (T_DOUBLE (self)->value / d)); \
+  }
+}
+
+TDouble *t_double_inv (TNumber *self) {
+  t_double_unary_type_check (self);
+
+  return T_NUMBER (t_double_new_with_value (- T_DOUBLE (self)->value));
+}
+
+char *t_double_to_s (TNumber *self) {
+  t_double_unary_type_check (self);
+
+  double d;
+  g_object_get (T_DOUBLE (self), "value", &d, NULL);
+  return g_strdup_printf ("%lf", d);
+}
+
+static void t_double_class_init (TDoubleClass *class) {
+  TNumberClass *tnumber_class = T_NUMBER_CLASS (class);
+  GObjectClass *gobject_class = G_OBJECT_CLASS (class);
+
+  tnumber_class->add = t_double_add;
+  tnumber_class->sub = t_double_sub;
+  tnumber_class->mul = t_double_mul;
+  tnumber_class->div = t_double_div;
+  tnumber_class->inv = t_double_inv;
+  tnumber_class->to_s = t_double_to_s;
+
+  gobject_class->set_property = t_double_set_property;
+  gobject_class->get_property = t_double_get_property;
+  double_property = g_param_spec_double ("value", "val", "Double value", -G_MAXDOUBLE, G_MAXDOUBLE, 0, G_PARAM_READWRITE);
+  g_object_class_install_property (gobject_class, PROP_DOUBLE, double_property);
+}
+
+gboolean t_double_get_value (TDouble *d, double *value) {
+  g_return_val_if_fail (T_IS_DOUBLE (d), FALSE);
+
+  *value = d->value;
+  return TRUE;
+}
+
+void t_double_set_value (TDouble *d, double value) {
+  g_return_if_fail (T_IS_DOUBLE (d));
+
+  // // if not set via g_object_set, no notification signal is sent
+  // d->value = value;
+  g_object_set (d, "value", value, NULL);
+}
+
+TDouble *t_double_new_with_value (double value) {
+  TDouble *d;
+
+  d = g_object_new (T_TYPE_DOUBLE, "value", value, NULL);
+
+  return d;
+}
+
+TDouble *t_double_new (void) {
+  TDouble *d;
+
+  d = g_object_new (T_TYPE_DOUBLE, NULL);
+
+  return d;
+}
